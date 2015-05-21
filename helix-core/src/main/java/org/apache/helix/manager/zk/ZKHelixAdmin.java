@@ -721,6 +721,18 @@ public class ZKHelixAdmin implements HelixAdmin {
   }
 
   @Override
+  public void dropStateModelDef(String clusterName, String stateModelDef) {
+    if (!ZKUtil.isClusterSetup(clusterName, _zkClient)) {
+      throw new HelixException("cluster " + clusterName + " is not setup yet");
+    }
+    String stateModelDefPath = HelixUtil.getStateModelDefinitionPath(clusterName);
+    String stateModelPath = stateModelDefPath + "/" + stateModelDef;
+    if (_zkClient.exists(stateModelPath)) {
+      _zkClient.deleteRecursive(stateModelPath);
+    }
+  }
+
+  @Override
   public void dropResource(String clusterName, String resourceName) {
     HelixDataAccessor accessor =
         new ZKHelixDataAccessor(clusterName, new ZkBaseDataAccessor<ZNRecord>(_zkClient));
